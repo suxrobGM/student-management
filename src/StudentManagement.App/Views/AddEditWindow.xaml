@@ -1,0 +1,44 @@
+﻿<Window x:Class="StudentManagement.App.Views.AddEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="{Binding Title}"
+        ResizeMode="NoResize"
+        Height="500" 
+        Width="300">
+    
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding CloseCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <StackPanel Margin="5">
+            <Label Content="ID"></Label>
+            <TextBox Text="{Binding StudentForm.Id}" FontSize="14" Height="25"></TextBox>
+            <Label Content="First Name"></Label>
+            <TextBox Text="{Binding StudentForm.FirstName}" FontSize="14" Height="25"></TextBox>
+            <Label Content="Last Name"></Label>
+            <TextBox Text="{Binding StudentForm.LastName}" FontSize="14" Height="25"></TextBox>
+            <Label Content="SSN"></Label>
+            <!--<sync:SfMaskedEdit Mask="/d+." FontSize="14" Height="25"></sync:SfMaskedEdit>-->
+            <TextBox Text="{Binding StudentForm.SSN}" FontSize="14" Height="25"></TextBox>
+            <Label Content="Major"></Label>
+            <TextBox Text="{Binding StudentForm.Major}" FontSize="14" Height="25"></TextBox>
+            <Label Content="Birth Date"></Label>
+            <sync:DateTimeEdit Height="25" DateTime="{Binding StudentForm.BirthDate, Mode=TwoWay}" MinDateTime="01/01/1970" MaxDateTime="12/31/2005"/>
+            <Label Content="Address"></Label>
+            <TextBox Text="{Binding StudentForm.Address}" FontSize="14" Height="25"></TextBox>
+            <Label Content="GPA"></Label>
+            <TextBox Text="{Binding StudentForm.GPA}" FontSize="14" Height="25"></TextBox>
+            <WrapPanel Margin="0,10">
+                <Button Content="Save" Height="30" Width="60" Command="{Binding SaveCommand}"/>
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</Window>
