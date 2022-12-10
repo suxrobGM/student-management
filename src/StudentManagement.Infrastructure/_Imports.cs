@@ -1,4 +1,3 @@
-﻿global using StudentManagement.Domain;
-global using StudentManagement.Domain.Entities;
-global using StudentManagement.Domain.Repositories;
-global using StudentManagement.Infrastructure.Repositories;
+﻿global using StudentManagement.Domain.Entities;
+global using StudentManagement.Domain.Persistence;
+global using StudentManagement.Infrastructure.Persistence;

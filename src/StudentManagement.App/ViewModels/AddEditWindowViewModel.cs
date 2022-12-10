@@ -1,8 +1,10 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
+using Microsoft.EntityFrameworkCore;
 
 namespace StudentManagement.App.ViewModels;
 
@@ -20,7 +22,7 @@ public class AddEditWindowViewModel : ObservableRecipient, IRecipient<ValueChang
         Messenger.Register(this);
 
         StudentForm = new StudentForm();
-        SaveCommand = new RelayCommand(Save);
+        SaveCommand = new AsyncRelayCommand(SaveAsync);
         CloseCommand = new RelayCommand(Close);
     }
 
@@ -38,55 +40,33 @@ public class AddEditWindowViewModel : ObservableRecipient, IRecipient<ValueChang
         set => SetProperty(ref _editMode, value);
     }
 
+
+    private bool _canChangeId;
+    public bool CanChangeId
+    {
+        get => _canChangeId;
+        set => SetProperty(ref _canChangeId, value);
+    }
+
     public StudentForm StudentForm { get; }
 
-    public IRelayCommand SaveCommand { get; }
+    public IAsyncRelayCommand SaveCommand { get; }
     public IRelayCommand CloseCommand { get; }
-
-    private void Save()
-    {
-        StudentForm.Validate();
-
-        if (StudentForm.HasErrors)
-        {
-            var errors = string.Join('\n', StudentForm.GetErrors().Select(i => i.ErrorMessage)); 
-            MessageBox.Show(errors, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-        }
-        
-        try
-        {
-            if (EditMode)
-            {
-                _repository.Update(_id!.Value, StudentForm.ToEntity());
-            }
-            else
-            {
-                _repository.Add(StudentForm.ToEntity());
-                ResetForm();
-            }
-
-            MessageBox.Show("Student record has been saved successfully");
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
 
     public void Close()
     {
         Messenger.UnregisterAll(this);
     }
 
-    public void Receive(ValueChangedMessage<ulong?> message)
+    public async void Receive(ValueChangedMessage<ulong?> message)
     {
         if (message.Value != null)
         {
             _id = message.Value;
             EditMode = true;
+            CanChangeId = false;
             Title = $"Edit student record {_id}";
-            var student = _repository.Get(_id.Value);
+            var student = await _repository.GetAsync(_id.Value);
 
             StudentForm.Id = student!.Id;
             StudentForm.FirstName = student.FirstName;
@@ -100,13 +80,78 @@ public class AddEditWindowViewModel : ObservableRecipient, IRecipient<ValueChang
         else
         {
             EditMode = false;
+            CanChangeId = true;
             Title = "Add a new student";
+            await ResetFormAsync();
         }
     }
 
-    private void ResetForm()
+    private async Task SaveAsync()
     {
-        StudentForm.Id = 1;
+        StudentForm.Validate();
+
+        if (StudentForm.HasErrors)
+        {
+            var errors = string.Join('\n', StudentForm.GetErrors().Select(i => i.ErrorMessage));
+            MessageBox.Show(errors, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        try
+        {
+            if (EditMode)
+            {
+                await UpdateStudentAsync();
+            }
+            else
+            {
+                await AddStudentAsync();
+            }
+
+            MessageBox.Show("Student record has been saved successfully");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async Task AddStudentAsync()
+    {
+        var exisitingStudent = await _repository.GetAsync(StudentForm.Id);
+
+        if (exisitingStudent != null)
+        {
+            throw new InvalidOperationException($"The student with id {StudentForm.Id} already exists in the database.");
+        }
+
+        await _repository.AddAsync(StudentForm.ToEntity());
+        await ResetFormAsync();
+    }
+
+    private async Task UpdateStudentAsync()
+    {
+        var exisitingStudent = await _repository.GetAsync(StudentForm.Id);
+
+        if (exisitingStudent == null)
+            return;
+
+        exisitingStudent.FirstName = StudentForm.FirstName;
+        exisitingStudent.LastName = StudentForm.LastName;
+        exisitingStudent.Address = StudentForm.Address;
+        exisitingStudent.Major = StudentForm.Major;
+        exisitingStudent.SSN = StudentForm.SSN;
+        exisitingStudent.BirthDate = StudentForm.BirthDate;
+        exisitingStudent.GPA = StudentForm.GPA;
+
+        await _repository.UpdateAsync(exisitingStudent.Id, exisitingStudent);
+    }
+
+    private async Task ResetFormAsync()
+    {
+        var latestStudent = await _repository.Query().OrderBy(i => i.Id).LastOrDefaultAsync();
+
+        StudentForm.Id = latestStudent?.Id + 1 ?? 1;
         StudentForm.FirstName = string.Empty;
         StudentForm.LastName = string.Empty;
         StudentForm.Address = string.Empty;

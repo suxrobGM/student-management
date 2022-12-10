@@ -1,7 +1,8 @@
-﻿using System.Reflection;
+﻿using System.Linq.Expressions;
+using System.Reflection;
 using StudentManagement.Infrastructure.Options;
 
-namespace StudentManagement.Infrastructure.Repositories;
+namespace StudentManagement.Infrastructure.Persistence;
 
 internal class StudentRepository : IRepository<Student>
 {
@@ -21,20 +22,25 @@ internal class StudentRepository : IRepository<Student>
 
         _schema = GetSchema();
     }
-    
-    public Student? Get(ulong id)
+
+    public IQueryable<Student> Query(Expression<Func<Student, bool>>? predicate = null)
     {
-        var students = GetAll();
+        return GetAllAsync().Result.AsQueryable();
+    }
+
+    public async Task<Student?> GetAsync(ulong id)
+    {
+        var students = await GetAllAsync();
         return students.FirstOrDefault(i => i.Id == id);
     }
 
-    public IList<Student> GetAll()
+    public Task<List<Student>> GetAllAsync()
     {
         var list = new List<Student>();
         var lines = File.ReadAllLines(_filePath);
 
         if (lines.Length <= 1)
-            return list;
+            return Task.FromResult(list);
 
         for (var i = 1; i < lines.Length; i++)
         {
@@ -43,12 +49,12 @@ internal class StudentRepository : IRepository<Student>
             list.Add(student);
         }
 
-        return list;
+        return Task.FromResult(list);
     }
 
-    public void Add(Student entity)
+    public async Task AddAsync(Student entity)
     {
-        var existingStudent = Get(entity.Id);
+        var existingStudent = await GetAsync(entity.Id);
 
         if (existingStudent != null)
             throw new InvalidOperationException($"Student with ID '{entity.Id}' already exists");
@@ -57,9 +63,9 @@ internal class StudentRepository : IRepository<Student>
         writer.WriteLine(entity.ToRow(_schema, SEPARATOR));
     }
 
-    public void Update(ulong id, Student entity)
+    public async Task UpdateAsync(ulong id, Student entity)
     {
-        var students = GetAll();
+        var students = await GetAllAsync();
         var student = students.FirstOrDefault(i => i.Id == id);
 
         if (student == null)
@@ -76,9 +82,9 @@ internal class StudentRepository : IRepository<Student>
         WriteData(students);
     }
 
-    public void Delete(ulong id)
+    public async Task DeleteAsync(ulong id)
     {
-        var students = GetAll();
+        var students = await GetAllAsync();
         var student = students.FirstOrDefault(i => i.Id == id);
 
         if (student == null)
@@ -86,6 +92,7 @@ internal class StudentRepository : IRepository<Student>
 
         students.Remove(student);
         WriteData(students);
+        return;
     }
     
     private void WriteData(IEnumerable<Student> students)

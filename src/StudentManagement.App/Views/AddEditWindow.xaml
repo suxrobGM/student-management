@@ -20,7 +20,7 @@
     <Grid>
         <StackPanel Margin="5">
             <Label Content="ID"></Label>
-            <TextBox Text="{Binding StudentForm.Id}" FontSize="14" Height="25"></TextBox>
+            <TextBox Text="{Binding StudentForm.Id}" FontSize="14" Height="25" IsEnabled="{Binding CanChangeId}"></TextBox>
             <Label Content="First Name"></Label>
             <TextBox Text="{Binding StudentForm.FirstName}" FontSize="14" Height="25"></TextBox>
             <Label Content="Last Name"></Label>

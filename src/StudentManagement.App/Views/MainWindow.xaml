@@ -29,7 +29,7 @@
                 </sync:SfDataGrid.Columns>
             </sync:SfDataGrid>
             <WrapPanel Margin="0,10">
-                <Button Content="Add" Width="100" Height="30" Command="{Binding AddCommand}"/>
+                <Button Content="Add" Width="100" Height="30" Command="{Binding AddCommand}" IsEnabled="{Binding LoadedData}"/>
                 <Button Content="Edit" Width="100" Height="30" Margin="10, 0" Command="{Binding EditCommand}"/>
                 <Button Content="Remove" Width="100" Height="30" Margin="10, 0" Command="{Binding RemoveCommand}"/>
             </WrapPanel>

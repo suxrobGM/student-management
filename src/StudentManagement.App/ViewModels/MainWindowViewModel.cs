@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -14,11 +15,12 @@ public class MainWindowViewModel : ObservableRecipient
     public MainWindowViewModel(IRepository<Student> repository)
     {
         _repository = repository;
-        _students = FetchData();
-        AddCommand = new RelayCommand(OpenAddWindow);
-        EditCommand = new RelayCommand(OpenEditWindow, () => SelectedStudent != null);
-        RemoveCommand = new RelayCommand(RemoveData, () => SelectedStudent != null);
+        Students = new ObservableCollection<Student>();
+        AddCommand = new AsyncRelayCommand(OpenAddWindow);
+        EditCommand = new AsyncRelayCommand(OpenEditWindow, () => SelectedStudent != null);
+        RemoveCommand = new AsyncRelayCommand(RemoveData, () => SelectedStudent != null);
         SearchCommand = new RelayCommand<SfDataGrid>(Search);
+        Task.Run(UpdateStudensListAsync);
     }
 
     private Student? _selectedStudent;
@@ -40,26 +42,43 @@ public class MainWindowViewModel : ObservableRecipient
         set => SetProperty(ref _searchQuery, value);
     }
 
-    private ObservableCollection<Student> _students;
-    public ObservableCollection<Student> Students 
+    private bool _loadedData;
+    public bool LoadedData
     {
-        get => _students;
-        set => SetProperty(ref _students, value);
+        get => _loadedData;
+        set => SetProperty(ref _loadedData, value);
     }
 
-    public IRelayCommand AddCommand { get; }
-    public IRelayCommand EditCommand { get; }
-    public IRelayCommand RemoveCommand { get; }
+    public ObservableCollection<Student> Students { get; }
+
+    public IAsyncRelayCommand AddCommand { get; }
+    public IAsyncRelayCommand EditCommand { get; }
+    public IAsyncRelayCommand RemoveCommand { get; }
     public IRelayCommand<SfDataGrid> SearchCommand { get; }
 
-    private void OpenAddWindow()
+    private async Task UpdateStudensListAsync()
     {
-        var addWindow = new AddEditWindow();
-        addWindow.ShowDialog();
-        Students = FetchData();
+        LoadedData = false;
+        var students = await FetchDataAsync();
+        Students.Clear();
+
+        foreach (var student in students)
+        {
+            Students.Add(student);
+        }
+
+        LoadedData = true;
     }
 
-    private void OpenEditWindow()
+    private async Task OpenAddWindow()
+    {
+        var addWindow = new AddEditWindow();
+        WeakReferenceMessenger.Default.Send(new ValueChangedMessage<ulong?>(null));
+        addWindow.ShowDialog();
+        await UpdateStudensListAsync();
+    }
+
+    private async Task OpenEditWindow()
     {
         if (SelectedStudent == null)
             return;
@@ -67,10 +86,10 @@ public class MainWindowViewModel : ObservableRecipient
         var editWindow = new AddEditWindow();
         WeakReferenceMessenger.Default.Send(new ValueChangedMessage<ulong?>(SelectedStudent.Id));
         editWindow.ShowDialog();
-        Students = FetchData();
+        await UpdateStudensListAsync();
     }
 
-    private void RemoveData()
+    private async Task RemoveData()
     {
         var student = SelectedStudent;
 
@@ -82,7 +101,7 @@ public class MainWindowViewModel : ObservableRecipient
 
         if (result == MessageBoxResult.Yes)
         {
-            _repository.Delete(student.Id);
+            await _repository.DeleteAsync(student.Id);
             Students.Remove(student);
         }
     }
@@ -96,9 +115,9 @@ public class MainWindowViewModel : ObservableRecipient
         dataGrid.SearchHelper.Search(SearchQuery);
     }
 
-    private ObservableCollection<Student> FetchData()
+    private async Task<ObservableCollection<Student>> FetchDataAsync()
     {
-        var studentsList = _repository.GetAll();
+        var studentsList = await _repository.GetAllAsync();
         return new ObservableCollection<Student>(studentsList);
     }
 }

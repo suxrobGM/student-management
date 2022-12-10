@@ -1,10 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentManagement.App", "src\StudentManagement.App\StudentManagement.App.csproj", "{4AE47A40-30D0-41A1-9EB0-CB959232BD9E}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33103.201
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentManagement.App", "src\StudentManagement.App\StudentManagement.App.csproj", "{4AE47A40-30D0-41A1-9EB0-CB959232BD9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentManagement.Domain", "src\StudentManagement.Domain\StudentManagement.Domain.csproj", "{BAD7FA52-F987-41CA-A6A5-51F173F622BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentManagement.Domain", "src\StudentManagement.Domain\StudentManagement.Domain.csproj", "{BAD7FA52-F987-41CA-A6A5-51F173F622BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentManagement.Infrastructure", "src\StudentManagement.Infrastructure\StudentManagement.Infrastructure.csproj", "{1D71111F-AA50-4E85-A783-C91F3F0E17DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentManagement.Infrastructure", "src\StudentManagement.Infrastructure\StudentManagement.Infrastructure.csproj", "{1D71111F-AA50-4E85-A783-C91F3F0E17DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentManagement.Infrastructure.EF", "src\StudentManagement.Infrastructure.EF\StudentManagement.Infrastructure.EF.csproj", "{03DF28CB-A4C5-437C-88ED-034EFC3FF9D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +29,15 @@ Global
 		{1D71111F-AA50-4E85-A783-C91F3F0E17DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D71111F-AA50-4E85-A783-C91F3F0E17DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D71111F-AA50-4E85-A783-C91F3F0E17DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03DF28CB-A4C5-437C-88ED-034EFC3FF9D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03DF28CB-A4C5-437C-88ED-034EFC3FF9D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03DF28CB-A4C5-437C-88ED-034EFC3FF9D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03DF28CB-A4C5-437C-88ED-034EFC3FF9D1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F3B450CA-C8D8-40AD-828D-85BB830D7596}
 	EndGlobalSection
 EndGlobal

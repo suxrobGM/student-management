@@ -2,20 +2,27 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net6.0-windows</TargetFramework>
+        <TargetFramework>net7.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\StudentManagement.Infrastructure\StudentManagement.Infrastructure.csproj" />
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+      <PackageReference Include="Syncfusion.SfGrid.WPF" Version="20.3.0.60" />
+      <PackageReference Include="Syncfusion.SfInput.WPF" Version="20.3.0.60" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
-      <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-      <PackageReference Include="Syncfusion.SfGrid.WPF" Version="20.3.0.47" />
-      <PackageReference Include="Syncfusion.SfInput.WPF" Version="20.3.0.47" />
+      <ProjectReference Include="..\StudentManagement.Infrastructure.EF\StudentManagement.Infrastructure.EF.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
